@@ -84,7 +84,7 @@ end
 
 EntityBlocks = {}
 
-function build(x1,y1,z1,x2,y2,z2,f,s)
+function buildByPiston(x1,y1,z1,x2,y2,z2,f,s)
 
 width = math.abs(x2 - x1) + 1
 height = math.abs(y2 - y1) + 1
@@ -93,33 +93,92 @@ maze = Maze:new(height,width)
 
 maze:build(1,1,f,s)
 
-for i=1,width do
-    EntityBlocks[i] = {}
-    for j=1,height do
-        print(x1 + i - 1)
-        print(y1 + j - 1)
-
-        if(x2-x1>0 and y2-y1 >0) then
-            EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 + i - 1, y = y1 + j - 1, z = z1})
-        end
-        if(x2-x1 < 0 and y2-y1 < 0) then
-            EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 - i + 1, y = y1 - j + 1, z = z1})
-        end
-        if(x2-x1 < 0 and y2-y1 > 0) then
-            EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 - i + 1, y = y1 + j - 1, z = z1})
-        end
-        if(x2-x1 > 0 and y2-y1 < 0) then
-            EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 + i - 1, y = y1 - j + 1, z = z1})
-        end
-        EntityBlocks[i][j]:Event({action = 'reset'}, 0)
-        if(maze.array[i][j] ~= 0) then
-            EntityBlocks[i][j]:Event({action = 'use'}, 1)
+    for i=1,width do
+        EntityBlocks[i] = {}
+        for j=1,height do
+            if(x2-x1>0 and y2-y1 >0) then
+                EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 + i - 1, y = y1 + j - 1, z = z1})
+            end
+            if(x2-x1 < 0 and y2-y1 < 0) then
+                EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 - i + 1, y = y1 - j + 1, z = z1})
+            end
+            if(x2-x1 < 0 and y2-y1 > 0) then
+                EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 - i + 1, y = y1 + j - 1, z = z1})
+            end
+            if(x2-x1 > 0 and y2-y1 < 0) then
+                EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 + i - 1, y = y1 - j + 1, z = z1})
+            end
+            EntityBlocks[i][j]:Event({action = 'reset'}, 0)
+            if(maze.array[i][j] ~= 0) then
+                EntityBlocks[i][j]:Event({action = 'use'}, 1)
+            end
         end
     end
 end
 
+function buildByPiston(x1,y1,z1,x2,y2,z2,f,s)
+
+    width = math.abs(x2 - x1) + 1
+    height = math.abs(y2 - y1) + 1
+    
+    maze = Maze:new(height,width)
+    
+    maze:build(1,1,f,s)
+    
+        for i=1,width do
+            EntityBlocks[i] = {}
+            for j=1,height do
+                if(x2-x1>0 and y2-y1 >0) then
+                    EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 + i - 1, y = y1 + j - 1, z = z1})
+                end
+                if(x2-x1 < 0 and y2-y1 < 0) then
+                    EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 - i + 1, y = y1 - j + 1, z = z1})
+                end
+                if(x2-x1 < 0 and y2-y1 > 0) then
+                    EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 - i + 1, y = y1 + j - 1, z = z1})
+                end
+                if(x2-x1 > 0 and y2-y1 < 0) then
+                    EntityBlocks[i][j] = Game.EntityBlock:Create({x = x1 + i - 1, y = y1 - j + 1, z = z1})
+                end
+                EntityBlocks[i][j]:Event({action = 'reset'}, 0)
+                if(maze.array[i][j] ~= 0) then
+                    EntityBlocks[i][j]:Event({action = 'use'}, 1)
+                end
+            end
+    end
 end
 
-function Game.Rule:OnRoundStart()
-    build(25,-141,6,10,-175,6,100,true)
+function buildByblock(x1,y1,z1,x2,y2,z2,f,s)
+
+    width = math.abs(x2 - x1) + 1
+    height = math.abs(y2 - y1) + 1
+    long = math.abs(z2 - z1) + 1
+
+    maze = Maze:new(height,width)
+    
+    maze:build(1,1,f,s)
+    for i=1,width do
+        EntityBlocks[i] = {}
+        for j=1,height do
+            if(maze.array[i][j] == 0) then
+                if(x2-x1>0 and y2-y1 >0) then
+                    for k=1,long do
+                        Game.EntityBlock:Create({x = x1 + i - 1, y = y1 + j - 1, z = z1 + k - 1}):Event({ action = "signal" , value = true })
+                    end
+                elseif(x2-x1 < 0 and y2-y1 < 0) then
+                    for k=1,long do
+                        Game.EntityBlock:Create({x = x1 - i + 1, y = y1 - j + 1, z = z1 + k -1}):Event({ action = "signal" , value = true })
+                    end
+                elseif(x2-x1 < 0 and y2-y1 > 0) then
+                    for k=1,long do
+                        Game.EntityBlock:Create({x = x1 - i + 1, y = y1 + j - 1, z = z1 + k -1}):Event({ action = "signal" , value = true })
+                    end
+                elseif(x2-x1 > 0 and y2-y1 < 0) then
+                    for k=1,long do
+                        Game.EntityBlock:Create({x = x1 + i - 1, y = y1 - j + 1, z = z1 + k -1}):Event({ action = "signal" , value = true })
+                    end
+                end
+            end
+        end
+    end
 end
